@@ -5,11 +5,17 @@ date: "2026-10-18"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 
 library(p8105.datasets)
 library(tidyverse)
 library(ggridges)
+library(patchwork)
+
+knitr::opts_chunk$set(echo = TRUE,
+  fig.width = 0.6,
+  fig.asp = 0.6,
+  out.width = "90%"
+)
 
 theme_set(theme_minimal())
 ```
@@ -47,7 +53,7 @@ snow_counts =
 
 Looking at the most commonly observed values after cleaning the data set, 0mm of snowfall appears `r snow_counts |> filter(snow == 0) |> pull(n) |> format(big.mark = ",")` times, likely due to the fact that it rarely snows outside of the winter months. The second more commonly observed value is NA, totaling `r snow_counts |> filter(is.na(snow)) |> pull(n) |> format(big.mark = ",")` times, as many weather stations across New York State do not report snowfall. The next eight most commonly observed values are 25, 13, 51, 76, 8, 5, 38, and 3 (in mm).
 
-### Creating a Two-Panel Temperature Plot
+### Creating a Two-Panel Average Maximum Temperature Plot for January and July
 
 ```{r}
 
@@ -69,3 +75,31 @@ ny_noaa_df |>
 ```
 
 Plotting each station’s average maximum temperature for January and July from 1981 to 2010 shows that January is consistently colder than July. January averages generally fall between about -10°C and 10°C, while July averages fall between about 20°C and 33°C. January also varies more from year to year than July. In both months, the stations tend to rise and fall together. For example, nearly every station had a colder-than-usual January in 1994 and 2004 and a warmer January in 1990 and 2006, which suggests the year-to-year changes reflect regional weather patterns. A few notable outliers include one station that averaged a maximum of about 14°C in July 1988 and another that averaged about -13°C in January 1982.
+
+### Creating Plots for Temperature and Snowfall
+
+```{r, fig.width = 6, fig.asp = 1}
+
+ggp_tmax_tmin = 
+  ny_noaa_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_hex() +
+   labs(
+    title = "Maximum vs. Minimum Temperature",
+    x = "Minimum Temperature (°C)",
+    y = "Maximum Temperature (°C)") +
+  theme(legend.position = "right") +
+  coord_fixed()
+
+ggp_snowfall = 
+  ny_noaa_df |> 
+  filter(snow > 0, snow < 100) |> 
+  ggplot(aes(x = factor(year), y = snow)) + 
+  geom_boxplot() +
+  labs(
+    title = "Snowfall Between 1981 and 2010",
+    x = "Year",
+    y = "Snowfall (mm)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggp_tmax_tmin / ggp_snowfall
