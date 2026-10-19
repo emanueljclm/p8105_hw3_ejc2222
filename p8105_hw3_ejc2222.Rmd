@@ -10,6 +10,7 @@ library(p8105.datasets)
 library(tidyverse)
 library(ggridges)
 library(patchwork)
+library(haven)
 
 knitr::opts_chunk$set(echo = TRUE,
   fig.width = 0.6,
@@ -103,3 +104,48 @@ ggp_snowfall =
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ggp_tmax_tmin / ggp_snowfall
+```
+
+# Problem 2
+
+### Organizing Demographic and Accelerometer Data Sets
+
+```{r}
+
+nhanes_covar_df = 
+  read_csv(file = "./data/nhanes_covar.csv", na = c("NA", ".", ""), skip = 4) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = 
+      case_match(
+        sex, 
+        1 ~ "male", 
+        2 ~ "female"),
+    education =
+      case_match(
+        education,
+        1 ~ "less than high school",
+        2 ~ "high school",
+        3 ~ "more than high school"),
+    education = factor(education, levels = c("less than high school", "high school", "more than high school"))) |>
+  filter(age >= 21) |>
+  drop_na(age, education, sex)
+
+nhanes_covar_df |>
+  count(sex, education) |> 
+  pivot_wider(
+    names_from = sex, 
+    values_from = n) |>
+  knitr::kable()
+    
+nhanes_covar_df |>
+  mutate(sex = forcats::fct_relevel(sex, c("male", "female"))) |> 
+  ggplot(aes(x = education, y = age)) + 
+  geom_violin(aes(fill = sex), color = "blue", alpha = .5) + 
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Age Distribution by Sex and Education Level",
+    x = "Education",
+    y = "Age (years)",
+    fill = "Sex"
+  )
