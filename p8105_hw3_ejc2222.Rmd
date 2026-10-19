@@ -28,7 +28,7 @@ ny_noaa_df =
   janitor::clean_names() |> 
   mutate(
     year = year(date),    # e.g., 2007
-    month = month(date),  # 1-12
+    month = month(date, label = TRUE),  # 1-12
     day = day(date),     # 1-31
     prcp = prcp / 10,
     tmax = as.numeric(tmax) / 10,
@@ -39,7 +39,6 @@ snow_counts =
   ny_noaa_df |>
   count(snow) |>
   arrange(desc(n))
-
 ```
 
 ### Analyzing the Cleaned Data Set
@@ -48,3 +47,20 @@ Looking at the most commonly observed values after cleaning the data set, 0mm of
 
 ### Creating a Two-Panel Temperature Plot
 
+```{r}
+
+ny_noaa_df |> 
+  filter(month %in% c("Jan", "Jul")) |>
+  group_by(id, year, month) |>
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE)) |>
+  ggplot(aes(x = year, y = mean_tmax, group = id)) + 
+  geom_point(alpha = .1) + 
+  labs(
+    title = "Average January vs. July Maximum Temperatures by Weather Station",
+    x = "Year (1981-2010)",
+    y = "Average maximum temperature (C)",
+    caption = "Data from the rnoaa package") +
+  geom_line(alpha = .1) +
+  facet_grid(month ~ .)
+```
