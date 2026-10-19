@@ -15,10 +15,11 @@ library(ggridges)
 # Problem 1
 
 ```{r}
+
 data("ny_noaa")
 ```
 
-This dataset from the NOAA displays a ten-day weather forecast the week of November 1st, 2007 — November 10th, 2007 in New York. The seven key variables include the region, date, precipitation, inches of snowfall, the daily temperature high, and the daily temperature low. The table dimensions are 2,595,176 rows by 7 columns, with nearly all data missing in the first ten rows.
+This dataset from the NOAA displays daily observed weather from all New York State weather stations, January 1, 1981 to December 31, 2010. The seven key variables include the station ID, date, precipitation, snowfall, snow depth, daily temperature high, and daily temperature low. The table dimensions are `r nrow(ny_noaa)` by `r ncol(ny_noaa)`, with all data missing in the first ten rows.
 
 ```{r}
 
@@ -28,6 +29,9 @@ ny_noaa_df =
   mutate(
     year = year(date),    # e.g., 2007
     month = month(date),  # 1-12
-    day = day(date)       # 1-31
+    day = day(date),     # 1-31
+    prcp = prcp / 10,
+    tmax = as.numeric(tmax) / 10,
+    tmin = as.numeric(tmin) / 10
   )
 ```
