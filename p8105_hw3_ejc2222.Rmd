@@ -169,7 +169,25 @@ nhanes_accel_df =
   janitor::clean_names() |>
   pivot_longer(
     min1:min1440,
-    names_prefix = "min")
+    names_to = "minute",
+    names_prefix = "min",
+    values_to = "activity"
+      )
 
-nhanes_covar_df = left_join(nhanes_covar_df, nhanes_accel_df, by = "seqn")
+nhanes_df = left_join(nhanes_covar_df, nhanes_accel_df, by = "seqn")
+
+nhanes_df |>
+  group_by(seqn, sex, age, education) |>
+  summarize(
+    total_activity = sum(activity)) |>
+  drop_na() |>
+  ggplot(aes(x = age, y = total_activity, color = sex)) + 
+  geom_point(alpha = 0.5) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ education) +
+  labs(title = "Total Daily Activity Between Sexes by Age and Education",
+    x = "Age (yrs)",
+    y = "Total daily activity (MIMS)",
+    color = "Sex"
+  )
 ```
