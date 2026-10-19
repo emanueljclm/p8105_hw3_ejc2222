@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(p8105.datasets)
 library(tidyverse)
 library(ggridges)
+
+theme_set(theme_minimal())
 ```
 
 # Problem 1
@@ -55,12 +57,15 @@ ny_noaa_df |>
   summarize(
     mean_tmax = mean(tmax, na.rm = TRUE)) |>
   ggplot(aes(x = year, y = mean_tmax, group = id)) + 
-  geom_point(alpha = .1) + 
+  geom_point(aes(color = id), alpha = .1) + 
   labs(
     title = "Average January vs. July Maximum Temperatures by Weather Station",
     x = "Year (1981-2010)",
     y = "Average maximum temperature (C)",
     caption = "Data from the rnoaa package") +
-  geom_line(alpha = .1) +
-  facet_grid(month ~ .)
+  geom_line(aes(color = id), alpha = .1) +
+  facet_grid(month ~ .) +
+  theme(legend.position = "none")
 ```
+
+Plotting each station’s average maximum temperature for January and July from 1981 to 2010 shows that January is consistently colder than July. January averages generally fall between about -10°C and 10°C, while July averages fall between about 20°C and 33°C. January also varies more from year to year than July. In both months, the stations tend to rise and fall together. For example, nearly every station had a colder-than-usual January in 1994 and 2004 and a warmer January in 1990 and 2006, which suggests the year-to-year changes reflect regional weather patterns. A few notable outliers include one station that averaged a maximum of about 14°C in July 1988 and another that averaged about -13°C in January 1982.
