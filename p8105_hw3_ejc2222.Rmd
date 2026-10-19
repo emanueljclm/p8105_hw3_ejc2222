@@ -1,0 +1,33 @@
+---
+title: "p8105_hw3_ejc2222"
+output: github_document
+date: "2026-10-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(p8105.datasets)
+library(tidyverse)
+library(ggridges)
+```
+
+# Problem 1
+
+```{r}
+data("ny_noaa")
+```
+
+This dataset from the NOAA displays a ten-day weather forecast the week of November 1st, 2007 — November 10th, 2007 in New York. The seven key variables include the region, date, precipitation, inches of snowfall, the daily temperature high, and the daily temperature low. The table dimensions are 2,595,176 rows by 7 columns, with nearly all data missing in the first ten rows.
+
+```{r}
+
+ny_noaa_df = 
+  ny_noaa |> 
+  janitor::clean_names() |> 
+  mutate(
+    year = year(date),    # e.g., 2007
+    month = month(date),  # 1-12
+    day = day(date)       # 1-31
+  )
+```
