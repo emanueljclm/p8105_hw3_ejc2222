@@ -19,7 +19,7 @@ library(ggridges)
 data("ny_noaa")
 ```
 
-This dataset from the NOAA displays daily observed weather from all New York State weather stations, January 1, 1981 to December 31, 2010. The seven key variables include the station ID, date, precipitation, snowfall, snow depth, daily temperature high, and daily temperature low. The table dimensions are `r nrow(ny_noaa)` by `r ncol(ny_noaa)`, with all data missing in the first ten rows.
+This data set from the NOAA displays daily observed weather from all New York State weather stations, January 1, 1981 to December 31, 2010. The seven key variables include the station ID, date, precipitation, snowfall, snow depth, daily temperature high, and daily temperature low. The table dimensions are `r nrow(ny_noaa)` by `r ncol(ny_noaa)`, with all data missing in the first ten rows.
 
 ```{r}
 
@@ -34,4 +34,17 @@ ny_noaa_df =
     tmax = as.numeric(tmax) / 10,
     tmin = as.numeric(tmin) / 10
   )
+
+snow_counts = 
+  ny_noaa_df |>
+  count(snow) |>
+  arrange(desc(n))
+
 ```
+
+### Analyzing the Cleaned Data Set
+
+Looking at the most commonly observed values after cleaning the data set, 0mm of snowfall appears `r snow_counts |> filter(snow == 0) |> pull(n) |> format(big.mark = ",")` times, likely due to the fact that it rarely snows outside of the winter months. The second more commonly observed value is NA, totaling `r snow_counts |> filter(is.na(snow)) |> pull(n) |> format(big.mark = ",")` times, as many weather stations across New York State do not report snowfall. The next eight most commonly observed values are 25, 13, 51, 76, 8, 5, 38, and 3 (in mm).
+
+### Creating a Two-Panel Temperature Plot
+
