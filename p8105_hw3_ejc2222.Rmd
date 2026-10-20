@@ -232,3 +232,56 @@ Comparing 24-hour activity for men and women, mean activity per minute (MIMS) fo
 Across education levels, participants with less than a high school education have the highest midday peak, at about 15 MIMS per minute. This is notable given that this group tends to be older, as shown in the earlier violin plot. One possible explanation is that people with less formal education are more likely to work in physically demanding jobs. In this group, men are also noticeably more active overnight than women, at about 5 MIMS at midnight compared with about 2.5 for women, and they stay more active until early morning. This may reflect overnight/shift work.
 
 The difference between women and men during the day grows with education level. In the more than high school group, women are more active than men from the morning through the evening, with the largest gap around 4 p.m. (about 14 compared with 11.5 MIMS). In the high school group, women are also more active during the day, but the gap is smaller. In the less than high school group, the two lines stay close and briefly cross, showing little consistent difference between men and women during the day.
+
+## Problem 3
+
+### Preparing CITI Bike Data
+
+```{r}
+
+jan_2020_citi_df = 
+  read_csv(file = "./data/jan_2020_citi.csv") |>
+  mutate(
+    year = 2020,
+    month = "January")
+
+july_2020_citi_df = 
+  read_csv(file = "./data/july_2020_citi.csv") |>
+  mutate(
+    year = 2020,
+    month = "July")
+
+jan_2024_citi_df = 
+  read_csv(file = "./data/jan_2024_citi.csv") |>
+  mutate(
+    year = 2024,
+    month = "January")
+
+july_2024_citi_df = 
+  read_csv(file = "./data/july_2024_citi.csv") |>
+  mutate(
+    year = 2024,
+    month = "July")
+
+citi_tidy =
+  bind_rows(jan_2020_citi_df, july_2020_citi_df, jan_2024_citi_df, july_2024_citi_df) |>
+  mutate(weekdays = factor(weekdays, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
+```
+
+The resulting data set shows the combined data on rides taken on the NYC Citi Bike system, particularly comparing use of the system in the months of January and July in both 2020 and 2024. Key variables include ride ID, ride type, weekday, ride duration, start and end station names, rider status, month, and year. The dimensions of this dataset are `r nrow(citi_tidy)` by `r ncol(citi_tidy)`.
+
+```{r}
+
+citi_tidy |>
+  count(month, year, member_casual) |> 
+  pivot_wider(
+    names_from = member_casual, 
+    values_from = n) |>
+  mutate(total_ridership = casual + member,
+         year = as.character(year)) |>
+  knitr::kable(
+    col.names = c("Month", "Year", "Casual", "Member", "Total Rides"),
+    format.args = list(big.mark = ","))
+```
+
+The table shows the number of Citi Bike rides in the dataset for each month and year, separated by casual riders and members. In both years, ridership increases from January to July, and casual riders drive much of that seasonal increase casual rides grew more from January to July in both 2020 and 2024 compared to membership rides. As a result, casual riders make up a much larger share of rides in the summer. This likely reflects tourists and occasional riders using the system more in the summer months. The seasonal increase was also larger in 2024, when total rides grew from January to July, compared to 2020. Ridership grew between the two years as well: January rides increased from 2020 to 2024, and July rides more than doubled. Several factors may contribute to this growth, including recovery after the COVID-19 pandemic.
