@@ -235,7 +235,7 @@ The difference between women and men during the day grows with education level. 
 
 ## Problem 3
 
-### Preparing CITI Bike Data
+### Preparing Citi Bike Data
 
 ```{r}
 
@@ -285,3 +285,16 @@ citi_tidy |>
 ```
 
 The table shows the number of Citi Bike rides in the dataset for each month and year, separated by casual riders and members. In both years, ridership increases from January to July, and casual riders drive much of that seasonal increase casual rides grew more from January to July in both 2020 and 2024 compared to membership rides. As a result, casual riders make up a much larger share of rides in the summer. This likely reflects tourists and occasional riders using the system more in the summer months. The seasonal increase was also larger in 2024, when total rides grew from January to July, compared to 2020. Ridership grew between the two years as well: January rides increased from 2020 to 2024, and July rides more than doubled. Several factors may contribute to this growth, including recovery after the COVID-19 pandemic.
+
+### Most Popular Citi Bike Stations in July 2024
+
+```{r}
+
+citi_tidy |>
+  filter(month == "July", year == 2024) |>
+  drop_na(start_station_name) |>
+  count(start_station_name) |>
+  arrange(desc(n)) |>
+  head() |>
+  knitr::kable(
+    col.names = c("Starting station", "Number of rides"))
